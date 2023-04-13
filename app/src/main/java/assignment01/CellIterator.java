@@ -1,6 +1,8 @@
 package assignment01;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 
 public class CellIterator implements Iterator<Cell> {
   Cell[][] data;
@@ -22,6 +24,9 @@ public class CellIterator implements Iterator<Cell> {
 
   @Override
   public Cell next() {
+    if (runOut) {
+      throw new NoSuchElementException();
+    }
     Cell ret = data[outer][inner];
     inner++;
     if (inner >= data[outer].length) {

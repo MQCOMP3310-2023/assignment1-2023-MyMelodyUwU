@@ -156,17 +156,15 @@ public class Grid implements Iterable<Cell>{
 
         
         //crude method
+
         for(int i = 0; i < cells[activeRow].length; i++){
-            if(!highlighted.get(i)){
+            if(!highlighted.get(i) && wordToGuess.contains(cells[activeRow][i].getStoredCharacter())){
                 char c = cells[activeRow][i].getStoredCharacter().charAt(0);
                 int countHighlighted = numberAlreadyHighlighted(c, cells[activeRow], highlighted);
                 int countOccurences = numberOccurencesInGoal(c);
-
-                if(wordToGuess.contains(cells[activeRow][i].getStoredCharacter())){
-                    if(countHighlighted < countOccurences){
-                        cells[activeRow][i].setState(2); 
-                        highlighted.set(i);
-                    }
+                if(countHighlighted < countOccurences){
+                    cells[activeRow][i].setState(2); 
+                    highlighted.set(i);
                 }
             }
         }

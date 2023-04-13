@@ -7,29 +7,25 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SQLiteConnectionManager {
 
-    //private Connection wordleDBConn = null;
     private String databaseURL = "";
-    
     private String wordleDropTableString = "DROP TABLE IF EXISTS wordlist;";
     private String wordleCreateString = 
           "CREATE TABLE wordlist (\n" 
         + "	id integer PRIMARY KEY,\n"
         + "	word text NOT NULL\n"
         + ");";
-    
     private String validWordsDropTableString = "DROP TABLE IF EXISTS validWords;";
     private String validWordsCreateString = 
           "CREATE TABLE validWords (\n" 
         + "	id integer PRIMARY KEY,\n"
         + "	word text NOT NULL\n"
         + ");";
-
-    //private String populateWordle;
-    //private String populateValidWords;
-
+    private Logger logger = Logger.getLogger(SQLiteConnectionManager.class.getName());
 
     /**
      * Set the database file name in the sqlite project to use
@@ -46,23 +42,23 @@ public class SQLiteConnectionManager {
      *
      * @param fileName the database file name
      */
-    public void createNewDatabase(String fileName) {
+  public void createNewDatabase(String fileName) {
 
         try (Connection conn = DriverManager.getConnection(databaseURL)) {
             if (conn != null) {
                 DatabaseMetaData meta = conn.getMetaData();
-                System.out.println("The driver name is " + meta.getDriverName());
-                System.out.println("A new database has been created.");
+                logger.log(Level.INFO, "The driver name is {0}", meta.getDriverName());
+                logger.log(Level.INFO, "A new database has been created.");
                 
             }
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            logger.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
     /**
-     * Check that the file has been cr3eated
+     * Check that the file has been created
      *
      * @return true if the file exists in the correct location, false otherwise. If no url defined, also false.
      */
@@ -75,7 +71,7 @@ public class SQLiteConnectionManager {
                     return true; 
                 }
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                logger.log(Level.SEVERE, e.getMessage(), e);
                 return false;
             }
         }
@@ -88,8 +84,8 @@ public class SQLiteConnectionManager {
      * @return true if the table structures have been created.
      */
     public boolean createWordleTables(){
-        if(databaseURL != ""){
-            try (   Connection conn = DriverManager.getConnection(databaseURL);
+        if(!databaseURL.equals("")) {
+            try (Connection conn = DriverManager.getConnection(databaseURL);
                     Statement stmt = conn.createStatement()
                 ) 
             {
@@ -101,14 +97,15 @@ public class SQLiteConnectionManager {
                     return true;  
                 } 
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                logger.log(Level.SEVERE, e.getMessage(), e);
                 return false;
             }
             
         }
         return false;
         
-    }
+    } 
+
 
     /**
      * Take an id and a word and store the pair in the valid words
@@ -125,7 +122,7 @@ public class SQLiteConnectionManager {
             pstmt.setString(2, word);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            logger.log(Level.INFO, e.getMessage(), e);
         }
 
     }
@@ -145,7 +142,7 @@ public class SQLiteConnectionManager {
                 result = cursor.getString(1);
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            logger.log(Level.INFO, e.getMessage(), e);
         }
         
 
